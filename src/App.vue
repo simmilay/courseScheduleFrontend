@@ -10,15 +10,16 @@
               <v-list-item v-for="(teacher, index) in store.teachers" :key="index">
                 <v-list-item-title>{{ teacher.name }}</v-list-item-title>
                 <div class="flex gap-2">
-                <v-list-item-subtitle v-for="tchr in teacher.course" :key="tchr"
-                  >{{tchr}} </v-list-item-subtitle
-                > </div>
+                  <v-list-item-subtitle v-for="tchr in teacher.course" :key="tchr"
+                    >{{ tchr }}
+                  </v-list-item-subtitle>
+                </div>
                 <v-list-item-subtitle>{{ teacher.off_day }} İzinli</v-list-item-subtitle>
                 <template v-slot:append>
                   <v-btn
                     icon="mdi-close"
                     variant="text"
-                    @click="store.removeTeacher(index)"
+                    @click="store.removeTeacher(teacher.id)"
                   ></v-btn>
                 </template>
               </v-list-item>
@@ -38,7 +39,7 @@
                 <v-list-item-subtitle>{{ room.room_type }}</v-list-item-subtitle>
 
                 <template v-slot:append>
-                  <v-btn icon="mdi-close" variant="text" @click="store.removeRoom(index)"></v-btn>
+                  <v-btn icon="mdi-close" variant="text" @click="store.removeRoom(room.id)"></v-btn>
                 </template>
               </v-list-item>
             </v-card-text>
@@ -59,7 +60,7 @@
                   ><v-btn
                     icon="mdi-close"
                     variant="text"
-                    @click="store.removeRequirement(index)"
+                    @click="store.removeRequirement(req.id)"
                   ></v-btn
                 ></template>
               </v-list-item>
@@ -83,35 +84,13 @@
             @close="reqModalVisible = false"
             @save="store.addRequirement($event)"
           />
-          <v-btn color="primary" block :loading="store.loading" @click="store.generateSchedule"
+          <v-btn color="primary" block :loading="store.loading" @click="store.generateSchedule()"
             >Program Oluştur</v-btn
           >
         </v-col>
         <v-col cols="8"
           ><v-col cols="8">
             <div v-if="store.results.length > 0">
-                <!-- <v-expansion-panels>
-                  <v-expansion-panel v-for="(sol, idx) in store.results" :key="idx">
-                    <v-expansion-panel-title>
-                      Çözüm {{ idx + 1 }} (Fitness: {{ sol.fitness }})
-                      <v-chip v-if="!sol.is_complete" color="error" size="small" class="ml-2"
-                        >Eksik!</v-chip
-                      >
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      <div v-for="(hours, day) in sol.schedule" :key="day">
-                        <h4 class="mt-2">{{ day }}</h4>
-                        <div v-for="(entries, hour) in hours" :key="hour">
-                          <span v-if="entries.length > 0">
-                            Saat {{ hour }}: {{ entries[0].course }} ({{ entries[0].classroom }}) -
-                            {{ entries[0].teacher }}
-                          </span>
-                        </div>
-                      </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels> -->
-
               <v-card v-for="(sol, idx) in store.results" :key="idx">
                 <v-expansion-panels>
                   <v-expansion-panel>
@@ -186,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useScheduleStore } from './stores/schedule'
 import TeacherModal from './components/TeacherModal.vue'
@@ -199,9 +178,15 @@ const roomModalVisible = ref(false)
 const reqModalVisible = ref(false)
 const roundingEnabled = ref(true)
 
+
 const titleBgColor = (fitness) => {
   if (fitness >= 80) return 'text-green'
   if (fitness >= 50) return 'text-orange'
   return 'text-red'
 }
+onMounted(() => {
+  store.fetchTeacher()
+  store.fetchRoom()
+  store.fetchRequirement()
+})
 </script>

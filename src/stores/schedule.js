@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { getTeachers, createTeacher, deleteTeacher } from '../services/teacher'
+import { getRooms, createRooms, deleteRooms } from '../services/room'
+import { getRequirements, deleteRequirements, createRequirements } from '../services/requirements'
+
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -10,23 +14,42 @@ export const useScheduleStore = defineStore('schedule', {
     loading: false,
   }),
   actions: {
-    addTeacher(teacher) {
-      this.teachers.push(teacher)
+    async fetchTeacher() {
+      const response = await getTeachers()
+      this.teachers = response.data
     },
-    removeTeacher(index) {
-      this.teachers.splice(index, 1)
+    async addTeacher(teacher) {
+      await createTeacher(teacher)
+      await this.fetchTeacher()
     },
-    addRoom(room) {
-      this.rooms.push(room)
+    async removeTeacher(id) {
+      await deleteTeacher(id)
+      await this.fetchTeacher()
     },
-    removeRoom(index) {
-      this.rooms.splice(index, 1)
+    async fetchRoom() {
+      const response = await getRooms()
+      this.rooms = response.data
     },
-    addRequirement(requirement) {
-      this.requirements.push(requirement)
+    async addRoom(room) {
+      await createRooms(room)
+      await this.fetchRoom()
+      
     },
-    removeRequirement(index) {
-      this.requirements.splice(index, 1)
+    async removeRoom(id) {
+      await deleteRooms(id)
+      await this.fetchRoom()
+    },
+    async fetchRequirement(){
+      const response = await getRequirements()
+      this.requirements = response.data
+    },
+    async addRequirement(requirement) {
+      await createRequirements(requirement)
+      await this.fetchRequirement()
+    },
+    async removeRequirement(id) {
+      await deleteRequirements(id)
+      await this.fetchRequirement()
     },
     async generateSchedule() {
       this.loading = true
