@@ -90,8 +90,8 @@
         </v-col>
         <v-col cols="8"
           ><v-col cols="8">
-            <div v-if="store.results.length > 0">
-              <v-card v-for="(sol, idx) in store.results" :key="idx">
+            <div v-if="store.activeSchedule">
+              <v-card v-for="(sol, idx) in store.activeSchedule.schedule" :key="idx">
                 <v-expansion-panels>
                   <v-expansion-panel>
                     <v-expansion-panel-title>
@@ -178,7 +178,6 @@ const roomModalVisible = ref(false)
 const reqModalVisible = ref(false)
 const roundingEnabled = ref(true)
 
-
 const titleBgColor = (fitness) => {
   if (fitness >= 80) return 'text-green'
   if (fitness >= 50) return 'text-orange'
@@ -188,5 +187,8 @@ onMounted(() => {
   store.fetchTeacher()
   store.fetchRoom()
   store.fetchRequirement()
+  store.fetchSchedule()
 })
 </script>
+
+
