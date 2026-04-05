@@ -5,11 +5,6 @@
       <v-card-text
         ><div class="flex flex-col gap-4 mb-2">
           <v-text-field v-model="name" label="Öğretmen Adı" variant="outlined"></v-text-field>
-          <!-- <v-text-field
-            v-model="course"
-            label="Verebileceği Dersler"
-            variant="outlined"
-          ></v-text-field> -->
           <v-select
             v-model="course"
             label="Verebileceği Dersler"

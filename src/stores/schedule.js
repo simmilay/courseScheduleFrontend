@@ -13,11 +13,12 @@ export const useScheduleStore = defineStore('schedule', {
     schedule: [],
     results: [],
     loading: false,
+    toast_message: '',
   }),
   getters: {
     activeSchedule: (state) => {
       return state.schedule.find((s) => s.is_active === true)
-    }
+    },
   },
   actions: {
     // teacher ekle - sil - fetch
@@ -71,12 +72,12 @@ export const useScheduleStore = defineStore('schedule', {
       await this.fetchRequirement()
     },
     async fetchSchedule() {
-        const response = await getSchedule()
-        this.schedule = response.data
-        const active = response.data.find((s) => s.is_active === true)
-        if (active) {
-          this.results = active.schedule
-        }
+      const response = await getSchedule()
+      this.schedule = response.data
+      const active = response.data.find((s) => s.is_active === true)
+      if (active) {
+        this.results = active.schedule
+      }
     },
 
     async saveSchedule() {
@@ -96,7 +97,17 @@ export const useScheduleStore = defineStore('schedule', {
     // Yeni takvim oluştur
     async generateSchedule() {
       this.loading = true
+
       try {
+        if (
+          this.teachers.length === 0 ||
+          this.rooms.length === 0 ||
+          this.requirements.length === 0
+        ) {
+          this.loading = false
+          this.toast_message = 'Derslik, öğretmen ve gereksinim bilgilerini eksiksiz doldurunuz.'
+          return false
+        }
         const response = await axios.post('http://127.0.0.1:8000/api/generate-schedule/', {
           teachers: this.teachers,
           rooms: this.rooms,
