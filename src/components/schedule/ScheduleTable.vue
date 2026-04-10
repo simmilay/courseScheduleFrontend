@@ -29,15 +29,13 @@
           class="border-b border-gray-100 px-2 py-1 min-w-28 vertical-align-top"
         >
           <div
-            v-for="(entry, i) in props.schedule[day][String(hour)]"
+            v-for="(entry, i) in props.schedule?.[day]?.[String(hour)] || []"
             :key="i"
             class="px-2 py-1.5 mb-1 bg-orange-50 border-l-2 border-orange-400 rounded text-xs shadow-sm"
           >
-            <div class="font-bold text-orange-900">{{ entry.classroom }}</div>
-            <div class="text-gray-700">{{ entry.course }}</div>
-            <div class="text-[10px] text-gray-500 mt-1 uppercase">
-              {{ entry.teacher }}
-            </div>
+            <div class="font-bold text-orange-900">{{ entry.classroom }} - {{ entry.course }}</div>
+            <!-- <div class="text-gray-700">{{ entry.course }}</div> -->
+            <div class="text-[10px] text-gray-600 mt-1">{{ entry.teacher }} - {{ entry.room }}</div>
           </div>
         </td>
       </tr>
@@ -46,5 +44,5 @@
 </template>
 
 <script setup>
-     const props = defineProps(['schedule'])
+const props = defineProps(['schedule'])
 </script>

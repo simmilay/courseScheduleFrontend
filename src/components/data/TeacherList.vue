@@ -13,9 +13,11 @@
       >
         <v-list-item-title class="font-weight-medium">{{ teacher.name }}</v-list-item-title>
         <v-list-item-subtitle>
-          {{ teacher.course.join(', ') }} · {{ teacher.off_day }} izinli
+          {{ teacher.course_names.join(', ') }} · {{ teacher.off_day }} izinli
         </v-list-item-subtitle>
         <template v-slot:append>
+          <div class="flex gap-5"></div>
+          <v-btn icon="mdi-pencil" variant="text"> </v-btn>
           <v-btn
             icon="mdi-trash-can-outline"
             variant="text"
@@ -29,7 +31,6 @@
   </div>
 </template>    
 <script setup>
-import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 const store = useScheduleStore()

@@ -1,27 +1,28 @@
 <template>
-  <v-dialog :model-value="props.visible">
+  <v-dialog :model-value="props.visible" width="600">
     <v-card>
-      <v-card-title>Ders Gereksinimleri</v-card-title>
+      <v-card-title class="mt-4">Ders Gereksinimleri</v-card-title>
       <v-card-text>
         <div class="flex flex-col gap-4 mb-2">
-          <v-text-field label="Sınıf" v-model="classroom" variant="outlined"></v-text-field>
-          <!-- <v-text-field label="Ders Adı" v-model="course" variant="outlined"></v-text-field> -->
           <v-select
-            label="Ders Adı"
+            label="Sınıf Seçiniz"
+            :items="all_classrooms"
+            v-model="classroom"
+            variant="outlined"
+          ></v-select>
+          <v-select
+            label="Öğretmen Seçiniz"
+            v-model="teacher"
+            variant="outlined"
+            :items="all_teachers"
+            @update:model-value="onTeacherChange"
+          ></v-select>
+          <v-select
+            label="Ders Seçiniz"
             v-model="course"
             variant="outlined"
-            :items="[
-              'Matematik',
-              'Fizik',
-              'Kimya',
-              'Biyoloji',
-              'Edebiyat',
-              'Tarih',
-              'Coğrafya',
-              'İngilizce',
-              'Programlama',
-              'Geometri',
-            ]"
+            :items="all_courses"
+            :disabled="!teacher"
           ></v-select>
           <v-text-field
             label="Haftalık Ders Saati"
@@ -31,10 +32,10 @@
           ></v-text-field>
         </div>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="emit('close')">İptal</v-btn>
-          <v-btn @click="save" color="primary">Ekle</v-btn>
+          <v-btn @click="save" variant="elevated" color="success">Ekle</v-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -42,24 +43,40 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useScheduleStore } from '@/stores/schedule'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['close', 'save'])
+const store = useScheduleStore()
+
+const all_teachers = computed(() => store.teachers.map((t) => ({ title: t.name, value: t.id })))
+const all_classrooms = computed(() => store.classrooms.map((c) => ({ title: c.name, value: c.id })))
+const all_courses = computed(() => store.teacher_courses.map((c) => ({ title: c.name, value: c.id })))
 
 const classroom = ref('')
 const weekly_hour = ref('')
 const course = ref('')
+const teacher = ref('')
+
+const onTeacherChange = async (id) => {
+  course.value = ''
+  await store.fetchTeacherCourse(id)
+}
 
 const save = () => {
   emit('save', {
     classroom: classroom.value,
     course: course.value,
+    teacher: teacher.value, 
     weekly_hours: parseInt(weekly_hour.value),
   })
   classroom.value = ''
   weekly_hour.value = ''
   course.value = ''
+  teacher.value = ''
   emit('close')
 }
+
+
 </script>

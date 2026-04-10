@@ -1,7 +1,7 @@
 <template>
-  <v-dialog :model-value="props.visible">
+  <v-dialog :model-value="props.visible" width="600">
     <v-card>
-      <v-card-title>Derslikler</v-card-title>
+      <v-card-title class="mt-3">Derslikler</v-card-title>
       <v-card-text>
         <div class="flex flex-col gap-4 mb-2">
           <v-text-field v-model="name" label="Derslik Adı" variant="outlined"></v-text-field>
@@ -13,10 +13,10 @@
           ></v-select>
         </div>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="emit('close')">İptal</v-btn>
-          <v-btn color="primary" @click="save">Save</v-btn>
+          <v-btn color="success" variant="elevated"  @click="save">Save</v-btn>
         </div>
       </v-card-actions>
     </v-card>

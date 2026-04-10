@@ -17,6 +17,7 @@
           <DataView />
         </v-tabs-window-item>
       </v-tabs-window>
+      
     </v-main>
   </v-app>
 </template>
@@ -37,6 +38,9 @@ onMounted(() => {
   store.fetchTeacher()
   store.fetchRoom()
   store.fetchRequirement()
+  store.fetchClassroom()
+  store.fetchCourse()
+  store.fetchTeacherCourse()
 })
 </script>
 

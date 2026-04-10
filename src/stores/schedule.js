@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { getTeachers, createTeacher, deleteTeacher } from '../services/teacher'
-import { getRooms, createRooms, deleteRooms } from '../services/room'
+import { getRooms, createRooms, deleteRooms , getLabRooms} from '../services/room'
 import { getRequirements, deleteRequirements, createRequirements } from '../services/requirements'
 import { getSchedule, createSchedule, deleteSchedule } from '@/services/schedule'
+import { getCourse, createCourse, deleteCourse, getTeacherCourses } from '../services/course'
+import { getClassroom, createClassroom, deleteClassroom } from '../services/classroom'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     teachers: [],
     rooms: [],
+    lab_rooms: [],
     requirements: [],
+    course :[],
+    teacher_courses: [],
+    classrooms: [],
     schedule: [],
     results: [],
     loading: false,
@@ -44,6 +50,11 @@ export const useScheduleStore = defineStore('schedule', {
       this.rooms = response.data
     },
 
+    async fetchLabRoom() {
+      const response = await getLabRooms()
+      this.lab_rooms = response.data
+    },
+
     async addRoom(room) {
       await createRooms(room)
       await this.fetchRoom()
@@ -53,6 +64,44 @@ export const useScheduleStore = defineStore('schedule', {
         is_active: false,
       })
       await this.fetchRoom()
+    },
+    // ders ekle - sil -fetch
+
+    async fetchCourse() {
+      const response = await getCourse()
+      this.course = response.data
+    },
+
+    async addCourse(course) {
+      await createCourse(course)
+      await this.fetchCourse()
+    },
+    async removeCourse(id) {
+      await deleteCourse(id, {
+        is_active: false,
+      })
+      await this.fetchCourse()
+    },
+
+    async fetchTeacherCourse(id) {
+      const response = await getTeacherCourses(id)
+      this.teacher_courses = response.data
+    },
+    //classroom ekle sil fetch
+    async fetchClassroom() {
+      const response = await getClassroom()
+      this.classrooms = response.data
+    },
+
+    async addClassroom(classroom) {
+      await createClassroom(classroom)
+      await this.fetchClassroom()
+    },
+    async removeClassroom(id) {
+      await deleteClassroom(id, {
+        is_active: false,
+      })
+      await this.fetchClassroom()
     },
 
     // Requirement ekle - sil - fetch
@@ -108,11 +157,7 @@ export const useScheduleStore = defineStore('schedule', {
           this.toast_message = 'Derslik, öğretmen ve gereksinim bilgilerini eksiksiz doldurunuz.'
           return false
         }
-        const response = await axios.post('http://127.0.0.1:8000/api/generate-schedule/', {
-          teachers: this.teachers,
-          rooms: this.rooms,
-          requirements: this.requirements,
-        })
+        const response = await axios.post('http://127.0.0.1:8000/api/generate-schedule/')
         this.results = response.data
         await this.saveSchedule()
       } finally {

@@ -1,6 +1,5 @@
 <template>
   <div class="align-center gap-3 pa-3">
-    <!-- Kategori seçici -->
     <v-btn-toggle
       v-model="activeCategory"
       density="compact"

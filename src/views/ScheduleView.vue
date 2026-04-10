@@ -1,14 +1,18 @@
 <template>
-  <v-alert v-if="store.results.length === 0" type="warning" class="ma-4">
-    Henüz program oluşturulmadı.
-  </v-alert>
+  <div>
+    <v-divider :thickness="2" color="success"></v-divider>
 
-  <div v-else class="pa-4">
-    <FilterChips v-model="selectedFilter" :options="filterOptions" />
+    <v-alert v-if="store.results.length === 0" type="warning" class="ma-4">
+      Henüz program oluşturulmadı.
+    </v-alert>
 
-    <v-card v-for="(sol, idx) in filteredResult" :key="idx" class="mb-4">
-      <ResultCard :sol="sol" :idx="idx" />
-    </v-card>
+    <div v-else class="pa-4">
+      <FilterChips v-model="selectedFilter" :options="filterOptions" />
+
+      <v-card v-for="(sol, idx) in filteredResult" :key="idx" class="mb-4">
+        <ResultCard :sol="sol" :idx="idx" />
+      </v-card>
+    </div>
   </div>
 </template>
 

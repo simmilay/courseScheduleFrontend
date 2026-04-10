@@ -1,43 +1,41 @@
 <template>
-   <v-alert v-if="store.requirements.length === 0" type="warning" class="ma-4">
-  Henüz sisteme sınıf bilgisi girilmedi.
- </v-alert>
+  <v-alert v-if="store.course.length === 0" type="warning" class="ma-4">
+    Henüz sisteme ders eklenmedi.
+  </v-alert>
 
   <div v-else class="pa-4">
     <v-list lines="two" density="compact">
       <v-list-item
-        v-for="(req, index) in store.requirements"
+        v-for="(course, index) in store.course"
         :key="index"
         rounded="lg"
         class="mb-1"
       >
-        <v-list-item-title class="font-weight-medium"
-          >{{ req.classroom_name }} · {{ req.course_name }}</v-list-item-title
-        >
-        <v-list-item-subtitle> {{ req.weekly_hours }} saat </v-list-item-subtitle>
+        <v-list-item-title class="font-weight-medium">{{ course.name }}</v-list-item-title>
+        <v-list-item-subtitle>
+          {{ course.is_lab ? 'Laboratuvar Dersi' : 'Normal Ders' }}
+        </v-list-item-subtitle>
         <template v-slot:append>
           <v-btn
             icon="mdi-trash-can-outline"
             variant="text"
             size="small"
             color="error"
-            @click="store.removeRequirement(req.id)"
+            @click="store.removeCourse(course.id)"
           />
         </template>
       </v-list-item>
     </v-list>
   </div>
-</template>    
-
-
+</template>
 
 <script setup>
-import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
+
 const store = useScheduleStore()
 
 onMounted(() => {
-  store.fetchRequirement()
+  store.fetchCourse()
 })
 </script>

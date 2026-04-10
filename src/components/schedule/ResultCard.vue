@@ -28,9 +28,7 @@
       <v-expansion-panel-text>
         <ScheduleTable :schedule="props.sol.schedule" />
 
-        <v-alert v-if="!props.sol.is_complete" type="warning" class="mt-4">
-          <div v-for="(msg, i) in props.sol.missing_slot" :key="i">{{ msg }}</div>
-        </v-alert>
+        
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
