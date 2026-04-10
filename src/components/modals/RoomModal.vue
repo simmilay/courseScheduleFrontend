@@ -7,7 +7,7 @@
           <v-text-field v-model="name" label="Derslik Adı" variant="outlined"></v-text-field>
           <v-select
             label="Derslik Tipi"
-            :items="['Normal Derslik','Laboratuvar']"
+            :items="['Normal Derslik', 'Laboratuvar']"
             v-model="room_type"
             variant="outlined"
           ></v-select>
@@ -16,7 +16,7 @@
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="emit('close')">İptal</v-btn>
-          <v-btn color="success" variant="elevated"  @click="save">Save</v-btn>
+          <v-btn color="success" variant="elevated" @click="save">Kaydet</v-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -24,16 +24,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 
 const name = ref('')
 const room_type = ref('')
 
+const ROOM_TYPE_LABEL = { normal: 'Normal Derslik', lab: 'Laboratuvar' }
+
+watch(() => props.editItem, (val) => {
+  name.value = val ? val.name : ''
+  room_type.value = val ? ROOM_TYPE_LABEL[val.room_type] : ''
+})
+
 const save = () => {
-  emit('save', { name: name.value, room_type: room_type.value ==='Laboratuvar' ? 'lab' : 'normal' })
+  emit('save', { name: name.value, room_type: room_type.value === 'Laboratuvar' ? 'lab' : 'normal' })
   name.value = ''
   room_type.value = ''
   emit('close')

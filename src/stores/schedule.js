@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { getTeachers, createTeacher, deleteTeacher } from '../services/teacher'
-import { getRooms, createRooms, deleteRooms , getLabRooms} from '../services/room'
-import { getRequirements, deleteRequirements, createRequirements } from '../services/requirements'
+import { getTeachers, createTeacher, deleteTeacher, updateTeacher } from '../services/teacher'
+import { getRooms, createRooms, deleteRooms, getLabRooms, updateRoom } from '../services/room'
+import { getRequirements, deleteRequirements, createRequirements, updateRequirements } from '../services/requirements'
 import { getSchedule, createSchedule, deleteSchedule } from '@/services/schedule'
-import { getCourse, createCourse, deleteCourse, getTeacherCourses } from '../services/course'
-import { getClassroom, createClassroom, deleteClassroom } from '../services/classroom'
+import { getCourse, createCourse, deleteCourse, getTeacherCourses, updateCourse } from '../services/course'
+import { getClassroom, createClassroom, deleteClassroom, updateClassroom } from '../services/classroom'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -13,7 +13,7 @@ export const useScheduleStore = defineStore('schedule', {
     rooms: [],
     lab_rooms: [],
     requirements: [],
-    course :[],
+    course: [],
     teacher_courses: [],
     classrooms: [],
     schedule: [],
@@ -42,9 +42,12 @@ export const useScheduleStore = defineStore('schedule', {
       })
       await this.fetchTeacher()
     },
+    async updateTeacher(id, teacher) {
+      await updateTeacher(id, teacher)
+      await this.fetchTeacher()
+    },
 
     // Room ekle - sil - fetch
-
     async fetchRoom() {
       const response = await getRooms()
       this.rooms = response.data
@@ -65,8 +68,12 @@ export const useScheduleStore = defineStore('schedule', {
       })
       await this.fetchRoom()
     },
-    // ders ekle - sil -fetch
+    async updateRoom(id, room) {
+      await updateRoom(id, room)
+      await this.fetchRoom()
+    },
 
+    // ders ekle - sil - fetch
     async fetchCourse() {
       const response = await getCourse()
       this.course = response.data
@@ -83,11 +90,17 @@ export const useScheduleStore = defineStore('schedule', {
       await this.fetchCourse()
     },
 
+    async updateCourse(id, course) {
+      await updateCourse(id, course)
+      await this.fetchCourse()
+    },
+
     async fetchTeacherCourse(id) {
       const response = await getTeacherCourses(id)
       this.teacher_courses = response.data
     },
-    //classroom ekle sil fetch
+
+    // classroom ekle sil fetch
     async fetchClassroom() {
       const response = await getClassroom()
       this.classrooms = response.data
@@ -104,8 +117,12 @@ export const useScheduleStore = defineStore('schedule', {
       await this.fetchClassroom()
     },
 
-    // Requirement ekle - sil - fetch
+    async updateClassroom(id, classroom) {
+      await updateClassroom(id, classroom)
+      await this.fetchClassroom()
+    },
 
+    // Requirement ekle - sil - fetch
     async fetchRequirement() {
       const response = await getRequirements()
       this.requirements = response.data
@@ -120,6 +137,11 @@ export const useScheduleStore = defineStore('schedule', {
       })
       await this.fetchRequirement()
     },
+    async updateRequirement(id, requirement) {
+      await updateRequirements(id, requirement)
+      await this.fetchRequirement()
+    },
+
     async fetchSchedule() {
       const response = await getSchedule()
       this.schedule = response.data

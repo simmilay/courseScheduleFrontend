@@ -3,7 +3,7 @@
   <v-app
     ><AppBar />
     <SideBar />
-    <v-main >
+    <v-main>
       <v-tabs v-model="activeTab" color="success">
         <v-tab value="program">Programlar</v-tab>
         <v-tab value="data">Veriler</v-tab>
@@ -17,7 +17,6 @@
           <DataView />
         </v-tabs-window-item>
       </v-tabs-window>
-      
     </v-main>
   </v-app>
 </template>
@@ -40,7 +39,6 @@ onMounted(() => {
   store.fetchRequirement()
   store.fetchClassroom()
   store.fetchCourse()
-  store.fetchTeacherCourse()
 })
 </script>
 

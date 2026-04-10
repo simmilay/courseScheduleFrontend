@@ -10,7 +10,7 @@
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="close">İptal</v-btn>
-          <v-btn color="success" variant="elevated" @click="save">Ekle</v-btn>
+          <v-btn color="success" variant="elevated" @click="save">Kaydet</v-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -18,14 +18,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 
 const name = ref('')
 
+watch(() =>
+props.editItem , (val) => {
+  name.value = val ? val.name : ''
+})
+
 const save = () => {
+  
   emit('save', { name: name.value })
   name.value = ''
   emit('close')

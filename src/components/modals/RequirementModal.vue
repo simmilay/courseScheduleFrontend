@@ -35,7 +35,7 @@
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="emit('close')">İptal</v-btn>
-          <v-btn @click="save" variant="elevated" color="success">Ekle</v-btn>
+          <v-btn @click="save" variant="elevated" color="success">Kaydet</v-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -43,10 +43,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible','editItem'])
 const emit = defineEmits(['close', 'save'])
 const store = useScheduleStore()
 
@@ -78,5 +78,10 @@ const save = () => {
   emit('close')
 }
 
-
+watch(() => props.editItem,(val)=>{
+  classroom.value = val ? val.classroom : ''
+  weekly_hour.value = val ? val.weekly_hours : ''
+  course.value = val ? val.course : ''
+  teacher.value = val ? val.teacher : ''
+})
 </script>

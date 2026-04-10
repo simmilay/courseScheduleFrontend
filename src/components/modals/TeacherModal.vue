@@ -22,7 +22,7 @@
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="emit('close')">İptal</v-btn>
-          <v-btn color="success" variant="elevated" @click="save">Ekle</v-btn>
+          <v-btn color="success" variant="elevated" @click="save">Kaydet</v-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 const store = useScheduleStore()
 
@@ -38,17 +38,17 @@ onMounted(() => {
   store.fetchCourse()
 })
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 
 const all_courses = computed(() => store.course.map((cr) => ({ title: cr.name, value: cr.id })))
 
 const off_day_choices = [
-  { title: 'Pazartesi', value: 'Pazartesi' },
-  { title: 'Salı', value: 'Sali' },
-  { title: 'Çarşamba', value: 'Carsamba' },
-  { title: 'Perşembe', value: 'Persembe' },
-  { title: 'Cuma', value: 'Cuma' },
+  { title: 'Pazartesi', value: '1' },
+  { title: 'Salı', value: '2' },
+  { title: 'Çarşamba', value: '3' },
+  { title: 'Perşembe', value: '4' },
+  { title: 'Cuma', value: '5' },
 ]
 
 const name = ref('')
@@ -62,4 +62,13 @@ const save = () => {
   off_day.value = ''
   emit('close')
 }
+
+watch(
+  () => props.editItem,
+  (val) => {
+    name.value = val ? val.name : ''
+    course.value = val ? val.course : []
+    off_day.value = val ? val.off_day : ''
+  }
+)
 </script>

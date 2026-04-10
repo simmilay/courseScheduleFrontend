@@ -19,7 +19,7 @@
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
           <v-btn @click="close">İptal</v-btn>
-          <v-btn @click="save" variant="elevated" color="success">Ekle</v-btn>
+          <v-btn @click="save" variant="elevated" color="success">Kaydet</v-btn>
         </div>
       </v-card-actions></v-card
     >
@@ -27,12 +27,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 
 const store = useScheduleStore()
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 
 const name = ref('')
@@ -40,7 +40,6 @@ const is_lab = ref(false)
 const lab = ref([])
 
 const lab_name = computed(() => store.lab_rooms.map((room) => room.name))
-
 
 const save = () => {
   emit('save', {
@@ -54,13 +53,20 @@ const save = () => {
   emit('close')
 }
 
-const close = ()=>{
+const close = () => {
   name.value = ''
   is_lab.value = false
   lab.value = ''
   emit('close')
 }
-
+watch(
+  () => props.editItem,
+  (val) => {
+    name.value = val ? val.name : ''
+    is_lab.value = val ? val.is_lab : false
+    lab.value = val ? val.lab : []
+  }
+)
 onMounted(() => {
   store.fetchLabRoom()
 })
