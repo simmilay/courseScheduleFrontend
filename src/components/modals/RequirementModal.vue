@@ -34,7 +34,7 @@
       </v-card-text>
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
-          <v-btn @click="emit('close')">İptal</v-btn>
+          <v-btn @click="close">İptal</v-btn>
           <v-btn @click="save" variant="elevated" color="success">Kaydet</v-btn>
         </div>
       </v-card-actions>
@@ -46,13 +46,15 @@
 import { computed, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 
-const props = defineProps(['visible','editItem'])
+const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 const store = useScheduleStore()
 
 const all_teachers = computed(() => store.teachers.map((t) => ({ title: t.name, value: t.id })))
 const all_classrooms = computed(() => store.classrooms.map((c) => ({ title: c.name, value: c.id })))
-const all_courses = computed(() => store.teacher_courses.map((c) => ({ title: c.name, value: c.id })))
+const all_courses = computed(() =>
+  store.teacher_courses.map((c) => ({ title: c.name, value: c.id }))
+)
 
 const classroom = ref('')
 const weekly_hour = ref('')
@@ -68,7 +70,7 @@ const save = () => {
   emit('save', {
     classroom: classroom.value,
     course: course.value,
-    teacher: teacher.value, 
+    teacher: teacher.value,
     weekly_hours: parseInt(weekly_hour.value),
   })
   classroom.value = ''
@@ -78,10 +80,21 @@ const save = () => {
   emit('close')
 }
 
-watch(() => props.editItem,(val)=>{
-  classroom.value = val ? val.classroom : ''
-  weekly_hour.value = val ? val.weekly_hours : ''
-  course.value = val ? val.course : ''
-  teacher.value = val ? val.teacher : ''
-})
+const close = () => {
+  classroom.value = ''
+  weekly_hour.value = ''
+  course.value = ''
+  teacher.value = ''
+  emit('close')
+}
+
+watch(
+  () => props.editItem,
+  (val) => {
+    classroom.value = val ? val.classroom : ''
+    weekly_hour.value = val ? val.weekly_hours : ''
+    course.value = val ? val.course : ''
+    teacher.value = val ? val.teacher : ''
+  }
+)
 </script>

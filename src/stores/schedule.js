@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { getTeachers, createTeacher, deleteTeacher, updateTeacher } from '../services/teacher'
+import { getTeachers, createTeacher, deleteTeacher, updateTeacher, getOffDay } from '../services/teacher'
 import { getRooms, createRooms, deleteRooms, getLabRooms, updateRoom } from '../services/room'
 import { getRequirements, deleteRequirements, createRequirements, updateRequirements } from '../services/requirements'
 import { getSchedule, createSchedule, deleteSchedule } from '@/services/schedule'
@@ -20,6 +20,7 @@ export const useScheduleStore = defineStore('schedule', {
     results: [],
     loading: false,
     toast_message: '',
+    off_days: [],
   }),
   getters: {
     activeSchedule: (state) => {
@@ -45,6 +46,11 @@ export const useScheduleStore = defineStore('schedule', {
     async updateTeacher(id, teacher) {
       await updateTeacher(id, teacher)
       await this.fetchTeacher()
+    },
+
+    async fetchOffDay(){
+      const response = await getOffDay()
+      this.off_days = response.data.off_days 
     },
 
     // Room ekle - sil - fetch
@@ -141,6 +147,7 @@ export const useScheduleStore = defineStore('schedule', {
       await updateRequirements(id, requirement)
       await this.fetchRequirement()
     },
+
 
     async fetchSchedule() {
       const response = await getSchedule()

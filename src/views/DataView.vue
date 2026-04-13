@@ -40,5 +40,5 @@ import RequirementList from '../components/data/RequirementList.vue'
 import CourseList from '../components/data/CourseList.vue'
 import ClassroomList from '../components/data/ClassroomList.vue'
 
-const activeTab = ref('teachers')
+const activeTab = ref('requirements')
 </script>

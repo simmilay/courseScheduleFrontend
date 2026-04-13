@@ -14,14 +14,16 @@
           ></v-select>
           <v-select
             label="Boş Günü"
-            :items="off_day_choices"
+            :items="store.off_days"
             v-model="off_day"
             variant="outlined"
+            item-title="title"
+            item-value="value"
           ></v-select></div
       ></v-card-text>
       <v-card-actions class="mb-3 mr-3">
         <div class="flex gap-3 justify-end">
-          <v-btn @click="emit('close')">İptal</v-btn>
+          <v-btn @click="close">İptal</v-btn>
           <v-btn color="success" variant="elevated" @click="save">Kaydet</v-btn>
         </div>
       </v-card-actions>
@@ -34,22 +36,18 @@ import { onMounted, ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 const store = useScheduleStore()
 
-onMounted(() => {
-  store.fetchCourse()
-})
-
 const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 
 const all_courses = computed(() => store.course.map((cr) => ({ title: cr.name, value: cr.id })))
 
-const off_day_choices = [
-  { title: 'Pazartesi', value: '1' },
-  { title: 'Salı', value: '2' },
-  { title: 'Çarşamba', value: '3' },
-  { title: 'Perşembe', value: '4' },
-  { title: 'Cuma', value: '5' },
-]
+// const off_day_choices = [
+//   { title: 'Pazartesi', value: '1' },
+//   { title: 'Salı', value: '2' },
+//   { title: 'Çarşamba', value: '3' },
+//   { title: 'Perşembe', value: '4' },
+//   { title: 'Cuma', value: '5' },
+// ]
 
 const name = ref('')
 const course = ref([])
@@ -57,6 +55,13 @@ const off_day = ref('')
 
 const save = () => {
   emit('save', { name: name.value, course: course.value, off_day: off_day.value })
+  name.value = ''
+  course.value = []
+  off_day.value = ''
+  emit('close')
+}
+
+const close = () => {
   name.value = ''
   course.value = []
   off_day.value = ''
@@ -71,4 +76,9 @@ watch(
     off_day.value = val ? val.off_day : ''
   }
 )
+
+onMounted(async() => {
+  store.fetchCourse()
+  await store.fetchOffDay()
+})
 </script>
