@@ -26,9 +26,23 @@
         </div>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
+        <div class="flex gap-2">
+          <v-chip size="small" color="success">Yoğunluk: %{{ props.sol.accupancy?.rate }}</v-chip>
+        <v-progress-linear
+          v-if="props.sol.accupancy"
+          :model-value="props.sol.accupancy?.rate"
+          :color="
+            props.sol.accupancy?.rate >= 80
+              ? 'error'
+              : props.sol.accupancy?.rate >= 50
+              ? 'warning'
+              : 'success'
+          "
+          rounded
+          height="6"
+          class="flex-1"
+        /></div>
         <ScheduleTable :schedule="props.sol.schedule" />
-
-        
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>

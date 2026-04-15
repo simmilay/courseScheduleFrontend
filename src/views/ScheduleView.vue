@@ -53,25 +53,37 @@ const filteredResult = computed(() => {
   if (selectedFilter.value === 'all') {
     return store.results
   } else {
-    return store.results.map((sol) => ({
-      ...sol,
-      schedule: Object.fromEntries(
+    return store.results.map((sol) => {
+      const total = 5*8
+      let count = 0
+
+      const filteredSchedule = Object.fromEntries(
         Object.entries(sol.schedule).map(([day, hours]) => [
           day,
           Object.fromEntries(
-            Object.entries(hours).map(([hour, entries]) => [
-              hour,
-              entries.filter(
+            Object.entries(hours).map(([hour, entries]) => {
+              const filteredEntries = entries.filter(
                 (e) =>
                   e.teacher === selectedFilter.value ||
                   e.classroom === selectedFilter.value ||
                   e.room === selectedFilter.value
-              ),
-            ])
+              )
+              if (filteredEntries.length > 0) count++
+              return [hour, filteredEntries]
+            })
           ),
         ])
-      ),
-    }))
+      )
+      return {
+        ...sol,
+        schedule: filteredSchedule,
+        accupancy: {
+          accupied: count,
+          total: total,
+          rate: Math.round((count / total) * 100),
+        },
+      }
+    })
   }
 })
 
