@@ -54,7 +54,7 @@ const filteredResult = computed(() => {
     return store.results
   } else {
     return store.results.map((sol) => {
-      const total = 5*8
+      const total = 5*7
       let count = 0
 
       const filteredSchedule = Object.fromEntries(

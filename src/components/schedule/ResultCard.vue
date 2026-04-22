@@ -26,10 +26,9 @@
         </div>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <div class="flex gap-2">
+        <div v-if="props.sol.accupancy" class="flex gap-2">
           <v-chip size="small" color="success">Yoğunluk: %{{ props.sol.accupancy?.rate }}</v-chip>
         <v-progress-linear
-          v-if="props.sol.accupancy"
           :model-value="props.sol.accupancy?.rate"
           :color="
             props.sol.accupancy?.rate >= 80
@@ -50,6 +49,7 @@
 
      <script setup>
 import ScheduleTable from './ScheduleTable.vue'
+
 
 const props = defineProps(['sol', 'idx'])
 </script>

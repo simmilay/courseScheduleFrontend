@@ -24,11 +24,16 @@
               variant="text"
               size="small"
               color="error"
-              @click="store.removeTeacher(teacher.id)"
+              @click="deleteTeacher(teacher)"
             />
           </template>
         </v-list-item>
       </v-list>
+      <v-pagination
+        v-model="currentPage"
+        :length="totalPages"
+        class="p-2 border-t border-gray-200"
+      />
     </div>
 
     <TeacherModal
@@ -37,13 +42,20 @@
       @save="store.updateTeacher(editItem.id, $event)"
       :edit-item="editItem"
     />
+    <DeleteModal
+      :visible="deleteModalVis"
+      :item-name="deleteItem?.name"
+      @confirm="handleDelete"
+      @cancel="deleteModalVis = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import TeacherModal from '../modals/TeacherModal.vue'
+import DeleteModal from '../modals/DeleteModal.vue'
 
 const DAY_LABELS = {
   1: 'Pazartesi',
@@ -58,12 +70,32 @@ const store = useScheduleStore()
 const editItem = ref(null)
 const modalVisble = ref(false)
 
+const currentPage = ref(1)
+const totalPages = ref(1)
+
+const deleteModalVis = ref(false)
+const deleteItem = ref(null)
 const openEdit = (teacher) => {
   editItem.value = teacher
   modalVisble.value = true
 }
 
-onMounted(() => {
-  store.fetchTeacher()
+const deleteTeacher = (teacher) => {
+  deleteItem.value = teacher
+  deleteModalVis.value = true
+}
+
+const handleDelete = async () => {
+  await store.removeTeacher(deleteItem.value.id)
+  deleteModalVis.value = false
+  deleteItem.value = null
+}
+
+watch(currentPage, async (newPage) => {
+  totalPages.value = await store.fetchTeacher(newPage)
+})
+
+onMounted(async () => {
+  totalPages.value = await store.fetchTeacher(currentPage.value)
 })
 </script>

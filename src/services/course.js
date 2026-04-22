@@ -1,6 +1,10 @@
 import api from './api'
 
-export const getCourse = () => api.get('courses/')
+export const getCourse = (currentPage) => api.get('courses/' ,{
+     params: {
+          page: currentPage
+     }
+})
 
 export const createCourse = (data) => api.post('courses/', data)
 

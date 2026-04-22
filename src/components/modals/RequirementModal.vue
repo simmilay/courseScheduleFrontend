@@ -11,18 +11,10 @@
             variant="outlined"
           ></v-select>
           <v-select
-            label="Öğretmen Seçiniz"
-            v-model="teacher"
-            variant="outlined"
-            :items="all_teachers"
-            @update:model-value="onTeacherChange"
-          ></v-select>
-          <v-select
             label="Ders Seçiniz"
             v-model="course"
             variant="outlined"
             :items="all_courses"
-            :disabled="!teacher"
           ></v-select>
           <v-text-field
             label="Haftalık Ders Saati"
@@ -50,33 +42,22 @@ const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 const store = useScheduleStore()
 
-const all_teachers = computed(() => store.teachers.map((t) => ({ title: t.name, value: t.id })))
 const all_classrooms = computed(() => store.classrooms.map((c) => ({ title: c.name, value: c.id })))
-const all_courses = computed(() =>
-  store.teacher_courses.map((c) => ({ title: c.name, value: c.id }))
-)
+const all_courses = computed(() => store.course.map((c) => ({ title: c.name, value: c.id })))
 
 const classroom = ref('')
 const weekly_hour = ref('')
 const course = ref('')
-const teacher = ref('')
-
-const onTeacherChange = async (id) => {
-  course.value = ''
-  await store.fetchTeacherCourse(id)
-}
 
 const save = () => {
   emit('save', {
     classroom: classroom.value,
     course: course.value,
-    teacher: teacher.value,
     weekly_hours: parseInt(weekly_hour.value),
   })
   classroom.value = ''
   weekly_hour.value = ''
   course.value = ''
-  teacher.value = ''
   emit('close')
 }
 
@@ -84,7 +65,6 @@ const close = () => {
   classroom.value = ''
   weekly_hour.value = ''
   course.value = ''
-  teacher.value = ''
   emit('close')
 }
 
@@ -94,7 +74,6 @@ watch(
     classroom.value = val ? val.classroom : ''
     weekly_hour.value = val ? val.weekly_hours : ''
     course.value = val ? val.course : ''
-    teacher.value = val ? val.teacher : ''
   }
 )
 </script>

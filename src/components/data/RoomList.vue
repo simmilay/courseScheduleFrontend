@@ -17,11 +17,16 @@
               variant="text"
               size="small"
               color="error"
-              @click="store.removeRoom(room.id)"
+              @click="deleteRoom(room)"
             />
           </template>
         </v-list-item>
       </v-list>
+      <v-pagination
+        v-model="currentPage"
+        :length="totalPages"
+        class="p-2 border-t border-gray-200"
+      />
     </div>
 
     <RoomModal
@@ -30,24 +35,51 @@
       @save="store.updateRoom(editItem.id, $event)"
       :edit-item="editItem"
     />
+    <DeleteModal
+      :visible="deleteModalVis"
+      :item-name="deleteItem?.name"
+      @confirm="handleDelete"
+      @cancel="deleteModalVis = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import RoomModal from '../modals/RoomModal.vue'
+import DeleteModal from '../modals/DeleteModal.vue'
 
 const store = useScheduleStore()
 const modalVisible = ref(false)
+const deleteModalVis = ref(false)
 const editItem = ref(null)
+const deleteItem = ref(null)
+
+const currentPage = ref(1)
+const totalPages = ref(1)
 
 const openEdit = (room) => {
   editItem.value = room
   modalVisible.value = true
 }
 
-onMounted(() => {
-  store.fetchRoom()
+const deleteRoom = (room) => {
+  deleteItem.value = room
+  deleteModalVis.value = true
+}
+
+const handleDelete = async () => {
+  await store.removeRoom(deleteItem.value.id)
+  deleteModalVis.value = false
+  deleteItem.value = null
+}
+
+watch(currentPage, async (newPage) => {
+  totalPages.value = await store.fetchRoom(newPage)
+})
+
+onMounted(async () => {
+  totalPages.value = await store.fetchRoom(1)
 })
 </script>

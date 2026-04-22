@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="hour in 8" :key="hour" class="hover:bg-gray-50 transition-colors">
+      <tr v-for="hour in 7" :key="hour" class="hover:bg-gray-50 transition-colors">
         <td
           class="border-b border-r border-gray-100 px-2 py-3 font-bold text-gray-600 bg-gray-50/50"
         >

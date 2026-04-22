@@ -16,7 +16,7 @@
     <div class="flex-wrap mt-2 ml-1">
       <v-chip-group
         :model-value="props.modelValue"
-        @update:model-value="emit('update:modelValue', $event)"
+        @update:model-value="emit('update:modelValue', $event ?? 'all')"
         class="flex-wrap"
         selected-class="text-primary"
         ><v-chip value="all" size="small" filter variant="flat" color="success" class="text-white">

@@ -1,11 +1,33 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { getTeachers, createTeacher, deleteTeacher, updateTeacher, getOffDay } from '../services/teacher'
+import {
+  getTeachers,
+  createTeacher,
+  deleteTeacher,
+  updateTeacher,
+  getOffDay,
+} from '../services/teacher'
 import { getRooms, createRooms, deleteRooms, getLabRooms, updateRoom } from '../services/room'
-import { getRequirements, deleteRequirements, createRequirements, updateRequirements } from '../services/requirements'
+import {
+  getRequirements,
+  deleteRequirements,
+  createRequirements,
+  updateRequirements,
+} from '../services/requirements'
 import { getSchedule, createSchedule, deleteSchedule } from '@/services/schedule'
-import { getCourse, createCourse, deleteCourse, getTeacherCourses, updateCourse } from '../services/course'
-import { getClassroom, createClassroom, deleteClassroom, updateClassroom } from '../services/classroom'
+import {
+  getCourse,
+  createCourse,
+  deleteCourse,
+  getTeacherCourses,
+  updateCourse,
+} from '../services/course'
+import {
+  getClassroom,
+  createClassroom,
+  deleteClassroom,
+  updateClassroom,
+} from '../services/classroom'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -29,9 +51,10 @@ export const useScheduleStore = defineStore('schedule', {
   },
   actions: {
     // teacher ekle - sil - fetch
-    async fetchTeacher() {
-      const response = await getTeachers()
-      this.teachers = response.data
+    async fetchTeacher(currentPage = 1) {
+      const response = await getTeachers(currentPage)
+      this.teachers = response.data.results
+      return Math.ceil(response.data.count / 7)
     },
     async addTeacher(teacher) {
       await createTeacher(teacher)
@@ -48,20 +71,21 @@ export const useScheduleStore = defineStore('schedule', {
       await this.fetchTeacher()
     },
 
-    async fetchOffDay(){
+    async fetchOffDay() {
       const response = await getOffDay()
-      this.off_days = response.data.off_days 
+      this.off_days = response.data.off_days
     },
 
     // Room ekle - sil - fetch
-    async fetchRoom() {
-      const response = await getRooms()
-      this.rooms = response.data
+    async fetchRoom(currentPage = 1) {
+      const response = await getRooms(currentPage)
+      this.rooms = response.data.results
+      return Math.ceil(response.data.count / 7)
     },
 
     async fetchLabRoom() {
       const response = await getLabRooms()
-      this.lab_rooms = response.data
+      this.lab_rooms = response.data.results
     },
 
     async addRoom(room) {
@@ -80,9 +104,10 @@ export const useScheduleStore = defineStore('schedule', {
     },
 
     // ders ekle - sil - fetch
-    async fetchCourse() {
-      const response = await getCourse()
-      this.course = response.data
+    async fetchCourse(currentPage = 1) {
+      const response = await getCourse(currentPage)
+      this.course = response.data.results
+      return Math.ceil(response.data.count / 7)
     },
 
     async addCourse(course) {
@@ -107,9 +132,10 @@ export const useScheduleStore = defineStore('schedule', {
     },
 
     // classroom ekle sil fetch
-    async fetchClassroom() {
-      const response = await getClassroom()
-      this.classrooms = response.data
+    async fetchClassroom(currentPage = 1) {
+      const response = await getClassroom(currentPage)
+      this.classrooms = response.data.results
+      return Math.ceil(response.data.count / 7)
     },
 
     async addClassroom(classroom) {
@@ -129,9 +155,10 @@ export const useScheduleStore = defineStore('schedule', {
     },
 
     // Requirement ekle - sil - fetch
-    async fetchRequirement() {
-      const response = await getRequirements()
-      this.requirements = response.data
+    async fetchRequirement(currentPage = 1) {
+      const response = await getRequirements(currentPage)
+      this.requirements = response.data.results
+      return Math.ceil(response.data.count / 7)
     },
     async addRequirement(requirement) {
       await createRequirements(requirement)
@@ -147,7 +174,6 @@ export const useScheduleStore = defineStore('schedule', {
       await updateRequirements(id, requirement)
       await this.fetchRequirement()
     },
-
 
     async fetchSchedule() {
       const response = await getSchedule()

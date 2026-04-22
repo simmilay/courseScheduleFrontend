@@ -39,7 +39,9 @@ const name = ref('')
 const is_lab = ref(false)
 const lab = ref([])
 
-const lab_name = computed(() => store.lab_rooms.map((room) => room.name))
+const lab_name = computed(() =>
+  store.lab_rooms.map((room) => ({ title: room.name, value: room.id }))
+)
 
 const save = () => {
   emit('save', {
