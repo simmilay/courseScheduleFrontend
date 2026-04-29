@@ -13,9 +13,10 @@
           class="mb-1"
         >
           <v-list-item-title class="font-weight-medium">{{ teacher.name }}</v-list-item-title>
-          <v-list-item-subtitle>
+          <v-list-item-subtitle v-if="teacher.off_day !== null">
             {{ teacher.course_names.join(', ') }} · {{ DAY_LABELS[teacher.off_day] }} izinli
           </v-list-item-subtitle>
+          <v-list-item-subtitle v-else> {{ teacher.course_names.join(', ') }} · Boş Günü Yok</v-list-item-subtitle>
           <template v-slot:append>
             <div class="flex gap-5"></div>
             <v-btn icon="mdi-pencil" variant="text" @click="openEdit(teacher)"> </v-btn>

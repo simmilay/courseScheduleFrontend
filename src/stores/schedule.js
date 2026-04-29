@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '../services/api'
 import {
   getTeachers,
   createTeacher,
@@ -212,7 +212,7 @@ export const useScheduleStore = defineStore('schedule', {
           this.toast_message = 'Derslik, öğretmen ve gereksinim bilgilerini eksiksiz doldurunuz.'
           return false
         }
-        const response = await axios.post('http://127.0.0.1:8000/api/generate-schedule/')
+        const response = await api.post('generate-schedule/')
         this.results = response.data
         await this.saveSchedule()
       } finally {

@@ -27,7 +27,11 @@
           <v-icon color="success">mdi-bag-personal-plus-outline</v-icon>
         </template>
       </v-list-item>
+      <v-list-item base-color="red"  title="Çıkış Yap" @click="logout">
+        <template v-slot:prepend> <v-icon color="red">mdi-logout</v-icon></template>
+      </v-list-item>
     </div>
+
     <TeacherModal
       :visible="teacherModalVisible"
       @close="teacherModalVisible = false"
@@ -59,13 +63,22 @@
 <script setup>
 import { ref } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const store = useScheduleStore()
+const authStore = useAuthStore()
 const teacherModalVisible = ref(false)
 const roomModalVisible = ref(false)
 const reqModalVisible = ref(false)
 const courseModalVisible = ref(false)
 const classroomModalVisible = ref(false)
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 
 import RoomModal from '../modals/RoomModal.vue'
 import TeacherModal from '../modals/TeacherModal.vue'

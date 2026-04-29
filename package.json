@@ -15,6 +15,7 @@
     "axios": "^1.13.6",
     "pinia": "^3.0.4",
     "vue": "beta",
+    "vue-router": "^5.0.6",
     "vuetify": "^4.0.3"
   },
   "devDependencies": {

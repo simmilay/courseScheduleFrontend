@@ -12,7 +12,6 @@
       <v-btn value="rooms" size="small">Derslik</v-btn>
     </v-btn-toggle>
 
-    <!-- Seçilen kategorinin chipleri -->
     <div class="flex-wrap mt-2 ml-1">
       <v-chip-group
         :model-value="props.modelValue"
