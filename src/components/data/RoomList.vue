@@ -1,38 +1,52 @@
 <template>
   <div>
-    <v-alert v-if="store.rooms.length === 0" type="warning" class="ma-4">
-      Henüz sisteme derslik bilgisi girilmedi.
-    </v-alert>
-
-    <div v-else class="pa-4">
-      <v-list lines="two" density="compact">
-        <v-list-item v-for="(room, index) in store.rooms" :key="index" rounded="lg" class="mb-1">
-          <v-list-item-title class="font-weight-medium">
-            {{ room.name }} · {{ room.room_type }}
-          </v-list-item-title>
-          <template v-slot:append>
-            <v-btn icon="mdi-pencil" variant="text" @click="openEdit(room)"></v-btn>
-            <v-btn
-              icon="mdi-trash-can-outline"
-              variant="text"
-              size="small"
-              color="error"
-              @click="deleteRoom(room)"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
-      <v-pagination
-        v-model="currentPage"
-        :length="totalPages"
-        class="p-2 border-t border-gray-200"
-      />
+    <div class="flex items-center justify-between px-4 py-3">
+      <h2>Derslikler</h2>
+      <v-btn color="warning" variant="elevated" prepend-icon="mdi-plus" size="small" class="rounded-2xl" @click="openAdd">
+        Derslik Ekle
+      </v-btn>
     </div>
+
+    <v-divider />
+
+    <v-data-table
+      :headers="headers"
+      :items="store.rooms"
+      hide-default-footer
+      :no-data-text="'Henüz sisteme derslik bilgisi girilmedi.'"
+      sort-asc-icon="mdi-sort-ascending"
+      sort-desc-icon="mdi-sort-descending"
+    >
+      <template #item.room_type="{ item }">
+        <v-chip
+          :color="item.room_type === 'lab' ? 'purple' : 'blue'"
+          variant="tonal"
+          size="small"
+          label
+        >
+          {{ item.room_type === 'lab' ? 'Laboratuvar' : 'Normal Derslik' }}
+        </v-chip>
+      </template>
+
+      <template #item.actions="{ item }">
+        <v-btn icon="mdi-pencil-outline" variant="text" size="small" @click="openEdit(item)" />
+        <v-btn icon="mdi-trash-can-outline" variant="text" size="small" color="error" @click="deleteRoom(item)" />
+      </template>
+    </v-data-table>
+
+    <v-pagination
+      v-if="totalPages > 1"
+      v-model="currentPage"
+      :length="totalPages"
+      density="compact"
+      :total-visible="5"
+      class="py-2 border-t"
+    />
 
     <RoomModal
       :visible="modalVisible"
-      @close="modalVisible = false"
-      @save="store.updateRoom(editItem.id, $event)"
+      @close="closeModal"
+      @save="handleSave"
       :edit-item="editItem"
     />
     <DeleteModal
@@ -55,13 +69,36 @@ const modalVisible = ref(false)
 const deleteModalVis = ref(false)
 const editItem = ref(null)
 const deleteItem = ref(null)
-
 const currentPage = ref(1)
 const totalPages = ref(1)
+
+const headers = [
+  { title: 'Derslik Adı', key: 'name', sortable: true },
+  { title: 'Tip', key: 'room_type', sortable: false },
+  { title: 'İşlemler', key: 'actions', sortable: false, align: 'end' },
+]
+
+const openAdd = () => {
+  editItem.value = null
+  modalVisible.value = true
+}
 
 const openEdit = (room) => {
   editItem.value = room
   modalVisible.value = true
+}
+
+const closeModal = () => {
+  modalVisible.value = false
+  editItem.value = null
+}
+
+const handleSave = async (data) => {
+  if (editItem.value) {
+    await store.updateRoom(editItem.value.id, data)
+  } else {
+    await store.addRoom(data)
+  }
 }
 
 const deleteRoom = (room) => {
