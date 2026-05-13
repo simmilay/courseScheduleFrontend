@@ -1,44 +1,43 @@
 <template>
   <div>
-    <v-alert v-if="store.classrooms.length === 0" type="warning" class="ma-4">
-      Henüz sisteme sınıf eklenmedi.
-    </v-alert>
-
-    <div v-else class="pa-4">
-      <v-list lines="two" density="compact">
-        <v-list-item
-          v-for="(classroom, index) in store.classrooms"
-          :key="index"
-          rounded="lg"
-          class="mb-1"
-        >
-          <v-list-item-title class="font-weight-medium">{{ classroom.name }}</v-list-item-title>
-          <template v-slot:append>
-            <v-btn icon="mdi-pencil" variant="text" @click="openEdit(classroom)"></v-btn>
-            <v-btn
-              icon="mdi-trash-can-outline"
-              variant="text"
-              size="small"
-              color="error"
-              @click="deleteClassroom(classroom)"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
-      <v-pagination
-        v-model="currentPage"
-        :length="totalPages"
-        class="p-2 border-t border-gray-200"
-      />
+    <div class="flex items-center justify-between px-4 py-3">
+      <h2>Sınıflar</h2>
+      <v-btn color="warning" variant="elevated" prepend-icon="mdi-plus" size="small" class="rounded-2xl" @click="openAdd">
+        Sınıf Ekle
+      </v-btn>
     </div>
+
+    <v-divider />
+
+    <v-data-table
+      :headers="headers"
+      :items="store.classrooms"
+      hide-default-footer
+      :no-data-text="'Henüz sisteme sınıf eklenmedi.'"
+      sort-asc-icon="mdi-sort-ascending"
+      sort-desc-icon="mdi-sort-descending"
+    >
+      <template #item.actions="{ item }">
+        <v-btn icon="mdi-pencil-outline" variant="text" size="small" @click="openEdit(item)" />
+        <v-btn icon="mdi-trash-can-outline" variant="text" size="small" color="error" @click="deleteClassroom(item)" />
+      </template>
+    </v-data-table>
+
+    <v-pagination
+      v-if="totalPages > 1"
+      v-model="currentPage"
+      :length="totalPages"
+      density="compact"
+      :total-visible="5"
+      class="py-2 border-t"
+    />
 
     <ClassroomModal
       :visible="modalVisible"
-      @close="modalVisible = false"
-      @save="store.updateClassroom(editItem.id, $event)"
+      @close="closeModal"
+      @save="handleSave"
       :edit-item="editItem"
     />
-
     <DeleteModal
       :visible="deleteModalVis"
       :item-name="deleteItem?.name"
@@ -53,18 +52,41 @@ import { onMounted, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import ClassroomModal from '../modals/ClassroomModal.vue'
 import DeleteModal from '../modals/DeleteModal.vue'
+
 const store = useScheduleStore()
 const modalVisible = ref(false)
+const deleteModalVis = ref(false)
 const editItem = ref(null)
+const deleteItem = ref(null)
 const currentPage = ref(1)
 const totalPages = ref(1)
 
-const deleteModalVis = ref(false)
-const deleteItem = ref(null)
+const headers = [
+  { title: 'Sınıf Adı', key: 'name', sortable: true },
+  { title: 'İşlemler', key: 'actions', sortable: false, align: 'end' },
+]
+
+const openAdd = () => {
+  editItem.value = null
+  modalVisible.value = true
+}
 
 const openEdit = (classroom) => {
   editItem.value = classroom
   modalVisible.value = true
+}
+
+const closeModal = () => {
+  modalVisible.value = false
+  editItem.value = null
+}
+
+const handleSave = async (data) => {
+  if (editItem.value) {
+    await store.updateClassroom(editItem.value.id, data)
+  } else {
+    await store.addClassroom(data)
+  }
 }
 
 const deleteClassroom = (classroom) => {
@@ -77,9 +99,11 @@ const handleDelete = async () => {
   deleteModalVis.value = false
   deleteItem.value = null
 }
+
 watch(currentPage, async (newPage) => {
   totalPages.value = await store.fetchClassroom(newPage)
 })
+
 onMounted(async () => {
   totalPages.value = await store.fetchClassroom(1)
 })
