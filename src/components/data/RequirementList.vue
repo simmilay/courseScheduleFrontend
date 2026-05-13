@@ -1,72 +1,104 @@
 <template>
-  <v-alert v-if="store.requirements.length === 0" type="warning" class="ma-4">
-    Henüz sisteme sınıf bilgisi girilmedi.
-  </v-alert>
+  <div>
+    <div class="flex items-center justify-between px-4 py-3">
+      <h2>Gereksinimler</h2>
+      <v-btn color="warning" variant="elevated" prepend-icon="mdi-plus" size="small" class="rounded-2xl" @click="openAdd">
+        Gereksinim Ekle
+      </v-btn>
+    </div>
 
-  <div v-else class="pa-4">
-    <v-list lines="two" density="compact">
-      <v-list-item
-        v-for="(req, index) in store.requirements"
-        :key="index"
-        rounded="lg"
-        class="mb-1"
-      >
-        <v-list-item-title class="font-weight-medium"
-          >{{ req.classroom_name }} · {{ req.course_name }}</v-list-item-title
-        >
-        <v-list-item-subtitle> {{ req.weekly_hours }} saat </v-list-item-subtitle>
-        <template v-slot:append>
-          <v-btn variant="text" icon="mdi-pencil" @click="openEdit(req)"></v-btn>
-          <v-btn
-            icon="mdi-trash-can-outline"
-            variant="text"
-            size="small"
-            color="error"
-            @click="deleteRequirement(req)"
-          />
-        </template>
-      </v-list-item>
-    </v-list>
-    <v-pagination v-model="currentPage" :length="totalPages" class="p-2 border-t border-gray-200" />
-    
+    <v-divider />
+
+    <v-data-table
+      :headers="headers"
+      :items="store.requirements"
+      hide-default-footer
+      :no-data-text="'Henüz sisteme gereksinim bilgisi girilmedi.'"
+      sort-asc-icon="mdi-sort-ascending"
+      sort-desc-icon="mdi-sort-descending"
+    >
+      <template #item.weekly_hours="{ item }">
+        <v-chip color="orange" variant="tonal" size="small" label>
+          {{ item.weekly_hours }} saat
+        </v-chip>
+      </template>
+
+      <template #item.actions="{ item }">
+        <v-btn icon="mdi-pencil-outline" variant="text" size="small" @click="openEdit(item)" />
+        <v-btn icon="mdi-trash-can-outline" variant="text" size="small" color="error" @click="deleteRequirement(item)" />
+      </template>
+    </v-data-table>
+
+    <v-pagination
+      v-if="totalPages > 1"
+      v-model="currentPage"
+      :length="totalPages"
+      density="compact"
+      :total-visible="5"
+      class="py-2 border-t"
+    />
+
     <RequirementModal
       :visible="modalVisible"
       :edit-item="editItem"
-      @close="modalVisible = false"
-      @save="store.updateRequirement(editItem.id, $event)"
+      @close="closeModal"
+      @save="handleSave"
     />
     <DeleteModal
       :visible="deleteModalVis"
-      :item-name="deleteItem?.name"
+      :item-name="deleteItem ? `${deleteItem.classroom_name} · ${deleteItem.course_name}` : ''"
       @confirm="handleDelete"
       @cancel="deleteModalVis = false"
     />
   </div>
-</template>    
-
-
+</template>
 
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import RequirementModal from '../modals/RequirementModal.vue'
 import DeleteModal from '../modals/DeleteModal.vue'
-const store = useScheduleStore()
 
+const store = useScheduleStore()
 const modalVisible = ref(false)
-const editItem = ref({})
+const deleteModalVis = ref(false)
+const editItem = ref(null)
+const deleteItem = ref(null)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const deleteModalVis = ref(false)
-const deleteItem = ref(null)
 
-const openEdit = (requirements) => {
-  editItem.value = requirements
+const headers = [
+  { title: 'Sınıf', key: 'classroom_name', sortable: true },
+  { title: 'Ders', key: 'course_name', sortable: true },
+  { title: 'Haftalık Saat', key: 'weekly_hours', sortable: true },
+  { title: 'İşlemler', key: 'actions', sortable: false, align: 'end' },
+]
+
+const openAdd = () => {
+  editItem.value = null
   modalVisible.value = true
 }
 
-const deleteRequirement = (requirements) => {
-  deleteItem.value = requirements
+const openEdit = (req) => {
+  editItem.value = req
+  modalVisible.value = true
+}
+
+const closeModal = () => {
+  modalVisible.value = false
+  editItem.value = null
+}
+
+const handleSave = async (data) => {
+  if (editItem.value) {
+    await store.updateRequirement(editItem.value.id, data)
+  } else {
+    await store.addRequirement(data)
+  }
+}
+
+const deleteRequirement = (req) => {
+  deleteItem.value = req
   deleteModalVis.value = true
 }
 
@@ -82,7 +114,6 @@ watch(currentPage, async (newPage) => {
 
 onMounted(async () => {
   totalPages.value = await store.fetchRequirement(1)
-
   store.fetchCourse()
   store.fetchClassroom()
 })
