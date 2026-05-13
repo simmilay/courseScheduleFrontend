@@ -1,46 +1,52 @@
 <template>
   <div>
-    <v-alert v-if="store.teachers.length === 0" type="warning" class="ma-4">
-      Henüz sisteme öğretmen eklenmedi.
-    </v-alert>
-
-    <div v-else class="pa-4">
-      <v-list lines="two" density="compact">
-        <v-list-item
-          v-for="(teacher, index) in store.teachers"
-          :key="index"
-          rounded="lg"
-          class="mb-1"
-        >
-          <v-list-item-title class="font-weight-medium">{{ teacher.name }}</v-list-item-title>
-          <v-list-item-subtitle v-if="teacher.off_day !== null">
-            {{ teacher.course_names.join(', ') }} · {{ DAY_LABELS[teacher.off_day] }} izinli
-          </v-list-item-subtitle>
-          <v-list-item-subtitle v-else> {{ teacher.course_names.join(', ') }} · Boş Günü Yok</v-list-item-subtitle>
-          <template v-slot:append>
-            <div class="flex gap-5"></div>
-            <v-btn icon="mdi-pencil" variant="text" @click="openEdit(teacher)"> </v-btn>
-            <v-btn
-              icon="mdi-trash-can-outline"
-              variant="text"
-              size="small"
-              color="error"
-              @click="deleteTeacher(teacher)"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
-      <v-pagination
-        v-model="currentPage"
-        :length="totalPages"
-        class="p-2 border-t border-gray-200"
-      />
+    <div class="flex items-center justify-between px-4 py-3">
+      <h2>Öğretmenler</h2>
+      <v-btn color="warning" variant="elevated" prepend-icon="mdi-plus" size="small" class="rounded-2xl" @click="openAdd">
+        Öğretmen Ekle
+      </v-btn>
     </div>
 
+    <v-divider />
+
+    <v-data-table
+      :headers="headers"
+      :items="store.teachers"
+      hide-default-footer
+      :no-data-text="'Henüz sisteme öğretmen eklenmedi.'"
+      sort-asc-icon="mdi-sort-ascending"
+      sort-desc-icon="mdi-sort-descending"
+    >
+      <template #item.course_names="{ item }">
+        <span>{{ item.course_names?.join(', ') || '—' }}</span>
+      </template>
+
+      <template #item.off_day="{ item }">
+        <v-chip v-if="item.off_day !== null" color="teal" variant="tonal" size="small" label>
+          {{ DAY_LABELS[item.off_day] }}
+        </v-chip>
+        <span v-else class="text-medium-emphasis">—</span>
+      </template>
+
+      <template #item.actions="{ item }">
+        <v-btn icon="mdi-pencil-outline" variant="text" size="small" @click="openEdit(item)" />
+        <v-btn icon="mdi-trash-can-outline" variant="text" size="small" color="error" @click="deleteTeacher(item)" />
+      </template>
+    </v-data-table>
+
+    <v-pagination
+      v-if="totalPages > 1"
+      v-model="currentPage"
+      :length="totalPages"
+      density="compact"
+      :total-visible="5"
+      class="py-2 border-t"
+    />
+
     <TeacherModal
-      :visible="modalVisble"
-      @close="modalVisble = false"
-      @save="store.updateTeacher(editItem.id, $event)"
+      :visible="modalVisible"
+      @close="closeModal"
+      @save="handleSave"
       :edit-item="editItem"
     />
     <DeleteModal
@@ -67,18 +73,41 @@ const DAY_LABELS = {
 }
 
 const store = useScheduleStore()
-
+const modalVisible = ref(false)
+const deleteModalVis = ref(false)
 const editItem = ref(null)
-const modalVisble = ref(false)
-
+const deleteItem = ref(null)
 const currentPage = ref(1)
 const totalPages = ref(1)
 
-const deleteModalVis = ref(false)
-const deleteItem = ref(null)
+const headers = [
+  { title: 'Ad Soyad', key: 'name', sortable: true },
+  { title: 'Dersler', key: 'course_names', sortable: false },
+  { title: 'Boş Gün', key: 'off_day', sortable: false },
+  { title: 'İşlemler', key: 'actions', sortable: false, align: 'end' },
+]
+
+const openAdd = () => {
+  editItem.value = null
+  modalVisible.value = true
+}
+
 const openEdit = (teacher) => {
   editItem.value = teacher
-  modalVisble.value = true
+  modalVisible.value = true
+}
+
+const closeModal = () => {
+  modalVisible.value = false
+  editItem.value = null
+}
+
+const handleSave = async (data) => {
+  if (editItem.value) {
+    await store.updateTeacher(editItem.value.id, data)
+  } else {
+    await store.addTeacher(data)
+  }
 }
 
 const deleteTeacher = (teacher) => {
@@ -97,6 +126,6 @@ watch(currentPage, async (newPage) => {
 })
 
 onMounted(async () => {
-  totalPages.value = await store.fetchTeacher(currentPage.value)
+  totalPages.value = await store.fetchTeacher(1)
 })
 </script>
