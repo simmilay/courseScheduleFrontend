@@ -1,62 +1,53 @@
 <template>
   <v-navigation-drawer permanent width="250">
     <div class="mt-3 gap-1 flex flex-col">
-      <v-list-item title="Derslik Ekle" @click="roomModalVisible = true">
-        <template v-slot:prepend>
-          <v-icon color="success">mdi-flask-empty-plus-outline</v-icon>
-        </template>
-      </v-list-item>
-      <v-list-item title="Ders Ekle" @click="courseModalVisible = true">
-        <template v-slot:prepend>
-          <v-icon color="success">mdi-book-open-variant-outline</v-icon>
-        </template>
-      </v-list-item>
-      <v-list-item title="Öğretmen Ekle" @click="teacherModalVisible = true">
-        <template v-slot:prepend>
-          <v-icon color="success">mdi-account-box-plus-outline</v-icon>
-        </template>
-      </v-list-item>
-      <v-list-item title="Sınıf Ekle" @click="classroomModalVisible = true">
-        <template v-slot:prepend>
-          <v-icon color="success">mdi-google-classroom</v-icon>
-        </template>
-      </v-list-item>
+      <v-list color="transparent">
+        <v-list-item title="Anasayfa" @click="router.push('/')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-home</v-icon>
+          </template>
+        </v-list-item>
+        <v-list-item title="Derslikler" @click="router.push('/rooms')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-flask-empty-plus-outline</v-icon>
+          </template>
+        </v-list-item>
+        <v-list-item title="Dersler" @click="router.push('/courses')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-book-open-variant-outline</v-icon>
+          </template>
+        </v-list-item>
+        <v-list-item title="Öğretmenler" @click="router.push('/teachers')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-account-box-plus-outline</v-icon>
+          </template>
+        </v-list-item>
+        <v-list-item title="Sınıflar" @click="router.push('/classrooms')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-google-classroom</v-icon>
+          </template>
+        </v-list-item>
 
-      <v-list-item title="Gereksinim Ekle" @click="reqModalVisible = true">
-        <template v-slot:prepend>
-          <v-icon color="success">mdi-bag-personal-plus-outline</v-icon>
-        </template>
-      </v-list-item>
-      <v-list-item base-color="red"  title="Çıkış Yap" @click="logout">
-        <template v-slot:prepend> <v-icon color="red">mdi-logout</v-icon></template>
-      </v-list-item>
+        <v-list-item title="Gereksinimler" @click="router.push('/requirements')">
+          <template v-slot:prepend>
+            <v-icon color="success">mdi-bag-personal-plus-outline</v-icon>
+          </template>
+        </v-list-item>
+      </v-list>
     </div>
 
-    <TeacherModal
-      :visible="teacherModalVisible"
-      @close="teacherModalVisible = false"
-      @save="store.addTeacher($event)"
-    />
-    <RoomModal
-      :visible="roomModalVisible"
-      @close="roomModalVisible = false"
-      @save="store.addRoom($event)"
-    />
-    <RequirementModal
-      :visible="reqModalVisible"
-      @close="reqModalVisible = false"
-      @save="store.addRequirement($event)"
-    />
-    <CourseModal
-      :visible="courseModalVisible"
-      @close="courseModalVisible = false"
-      @save="store.addCourse($event)"
-    />
-    <ClassroomModal
-      :visible="classroomModalVisible"
-      @close="classroomModalVisible = false"
-      @save="store.addClassroom($event)"
-    />
+
+    <template #append>
+      <v-list>
+            
+        <v-divider />
+        <v-list-item to="/settings" title="Ayarlar" @click="goToSettings"
+          ><template v-slot:prepend>
+            <v-icon color="success">mdi-cog</v-icon>
+          </template></v-list-item
+        >
+      </v-list>
+    </template>
   </v-navigation-drawer>
 </template>
 
@@ -69,16 +60,9 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = useScheduleStore()
 const authStore = useAuthStore()
-const teacherModalVisible = ref(false)
-const roomModalVisible = ref(false)
-const reqModalVisible = ref(false)
-const courseModalVisible = ref(false)
-const classroomModalVisible = ref(false)
 
-const logout = () => {
-  authStore.logout()
-  router.push('/login')
-}
+
+
 
 import RoomModal from '../modals/RoomModal.vue'
 import TeacherModal from '../modals/TeacherModal.vue'
