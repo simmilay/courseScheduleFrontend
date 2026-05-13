@@ -1,6 +1,12 @@
 <template>
   <v-app-bar elevation="1">
     <v-app-bar-title>Ders Planlama</v-app-bar-title>
+
+    <v-tabs v-model="activeTab" color="success">
+      <v-tab value="/home" :to="{ name: 'Home' }">Programlar</v-tab>
+      <v-tab value="/data" :to="{ name: 'Data' }">Veriler</v-tab>
+    </v-tabs>
+
     <v-snackbar
       v-model="scheduleSnackbar"
       color="red"
@@ -27,10 +33,14 @@
 
 <script setup>
 import { useScheduleStore } from '@/stores/schedule'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const store = useScheduleStore()
 const scheduleSnackbar = ref(false)
+const route = useRoute()
+
+const activeTab = computed(() => route.path)
 
 const generate_schedule = async () => {
   const result = await store.generateSchedule()
