@@ -21,12 +21,16 @@ import {
   deleteCourse,
   getTeacherCourses,
   updateCourse,
+  getAllCourse,
+  getDefaultCoursesLookup,
+  createNewCourse,
 } from '../services/course'
 import {
   getClassroom,
   createClassroom,
   deleteClassroom,
   updateClassroom,
+  getClassroomLookup,
 } from '../services/classroom'
 
 export const useScheduleStore = defineStore('schedule', {
@@ -36,8 +40,11 @@ export const useScheduleStore = defineStore('schedule', {
     lab_rooms: [],
     requirements: [],
     course: [],
+    all_courses: [],
+    default_courses: [],
     teacher_courses: [],
     classrooms: [],
+    all_classrooms: [],
     schedule: [],
     results: [],
     loading: false,
@@ -85,7 +92,7 @@ export const useScheduleStore = defineStore('schedule', {
 
     async fetchLabRoom() {
       const response = await getLabRooms()
-      this.lab_rooms = response.data.results
+      this.lab_rooms = response.data
     },
 
     async addRoom(room) {
@@ -108,12 +115,35 @@ export const useScheduleStore = defineStore('schedule', {
       const response = await getCourse(currentPage)
       this.course = response.data.results
       return Math.ceil(response.data.count / 7)
+      // return this.course
+    },
+
+    async fetchDefaultCourses() {
+      const response = await getDefaultCoursesLookup()
+      this.default_courses = response.data
+    },
+
+    async fetchAllCourses() {
+      const response = await getAllCourse()
+      this.all_courses = response.data
+    },
+
+    async fetchAllClassrooms() {
+      const response = await getClassroomLookup()
+      this.all_classrooms = response.data
     },
 
     async addCourse(course) {
       await createCourse(course)
       await this.fetchCourse()
     },
+
+    async addCustomCourse({ name, is_lab, allowed_rooms }) {
+      const courseRes = await createNewCourse({ name })
+      await createCourse({ course: courseRes.data.id, is_lab, allowed_rooms })
+      await this.fetchCourse()
+    },
+
     async removeCourse(id) {
       await deleteCourse(id, {
         is_active: false,
