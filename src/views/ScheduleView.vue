@@ -25,12 +25,15 @@ import ResultCard from '@/components/schedule/ResultCard.vue'
 const store = useScheduleStore()
 const selectedFilter = ref('all')
 
+const results = ref([])
+
 const filterOptions = computed(() => {
   if (!store.results?.length) return []
 
   const teachers = new Set()
   const classrooms = new Set()
   const rooms = new Set()
+  
 
   store.results.forEach((sol) => {
     Object.values(sol.schedule).forEach((hours) => {
