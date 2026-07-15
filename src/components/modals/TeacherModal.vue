@@ -5,13 +5,14 @@
       <v-card-text
         ><div class="flex flex-col gap-4 mb-2">
           <v-text-field v-model="name" label="Öğretmen Adı" variant="outlined"></v-text-field>
-          <v-select
+          <v-autocomplete
             v-model="course"
             label="Verebileceği Dersler"
             variant="outlined"
             multiple
             :items="all_courses"
-          ></v-select>
+     
+          ></v-autocomplete>
           <v-checkbox v-model="is_off_day" label="Boş Günü Var Mı ?"></v-checkbox>
           <v-select
           v-show="is_off_day"
@@ -36,12 +37,14 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
+
 const store = useScheduleStore()
 
 const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 const is_off_day = ref(false)
-const all_courses = computed(() => store.course.map((cr) => ({ title: cr.name, value: cr.id })))
+
+const all_courses = computed(() => store.all_courses.map((cr) => ({ title: cr.course_name, value: cr.id })))
 
 const name = ref('')
 const course = ref([])
@@ -74,7 +77,7 @@ watch(
 )
 
 onMounted(async () => {
-  store.fetchCourse()
+  store.fetchAllCourses()
   await store.fetchOffDay()
 })
 </script>

@@ -35,15 +35,15 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 
 const props = defineProps(['visible', 'editItem'])
 const emit = defineEmits(['close', 'save'])
 const store = useScheduleStore()
 
-const all_classrooms = computed(() => store.classrooms.map((c) => ({ title: c.name, value: c.id })))
-const all_courses = computed(() => store.course.map((c) => ({ title: c.name, value: c.id })))
+const all_classrooms = computed(() => store.all_classrooms.map((c) => ({ title: c.name, value: c.id })))
+const all_courses = computed(() => store.all_courses.map((c) => ({ title: c.course_name, value: c.id })))
 
 const classroom = ref('')
 const weekly_hour = ref('')
@@ -76,4 +76,9 @@ watch(
     course.value = val ? val.course : ''
   }
 )
+
+onMounted(() => {
+  store.fetchAllCourses()
+  store.fetchAllClassrooms()
+})
 </script>
