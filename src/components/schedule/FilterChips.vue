@@ -51,11 +51,35 @@
       style="min-width: 160px"
       @update:model-value="onSelect('room', $event)"
     />
+    <v-snackbar
+      v-model="scheduleSnackbar"
+      color="red"
+      location="top end"
+      :timeout="1500"
+      rounded="pill"
+    >
+      {{ store.toast_message }}
+      <template v-slot:actions>
+        <v-btn icon="mdi-close" variant="text" @click="scheduleSnackbar = false"></v-btn>
+      </template>
+    </v-snackbar>
+    <v-btn
+      color="warning"
+      class="mr-2"
+      variant="tonal"
+      :loading="store.loading"
+      @click="generate_schedule"
+      style="min-height: 41px"
+      
+    >
+      Program Oluştur
+    </v-btn>
   </div>
 </template>
 
 <script setup>
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, watch ,ref} from 'vue'
+import { useScheduleStore } from '@/stores/schedule'
 
 const props = defineProps(['options', 'modelValue'])
 const emit = defineEmits(['update:modelValue'])
@@ -66,6 +90,15 @@ const teacherOptions = computed(() => props.options.filter((o) => o.type === 'te
 const classroomOptions = computed(() => props.options.filter((o) => o.type === 'classroom'))
 const roomOptions = computed(() => props.options.filter((o) => o.type === 'room'))
 
+const store = useScheduleStore()
+const scheduleSnackbar = ref(false)
+
+const generate_schedule = async () => {
+  const result = await store.generateSchedule()
+  if (result === false) {
+    scheduleSnackbar.value = true
+  }
+}
 const onSelect = (type, value) => {
   if (value == null) {
     emit('update:modelValue', 'all')
@@ -95,3 +128,6 @@ watch(
   },
 )
 </script>
+
+
+ 
