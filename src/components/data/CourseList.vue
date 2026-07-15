@@ -74,7 +74,7 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 
 const headers = [
-  { title: 'Ders Adı', key: 'name', sortable: true },
+  { title: 'Ders Adı', key: 'course_name', sortable: true },
   { title: 'Tip', key: 'is_lab', sortable: false },
   { title: 'İşlemler', key: 'actions', sortable: false, align: 'end' },
 ]
@@ -95,10 +95,18 @@ const closeModal = () => {
 }
 
 const handleSave = async (data) => {
-  if (editItem.value) {
-    await store.updateCourse(editItem.value.id, data)
+  if (data.type === 'edit') {
+    await store.updateCourse(editItem.value.id, {
+      course: editItem.value.course,
+      is_lab: data.is_lab,
+      allowed_rooms: data.allowed_rooms,
+    })
+  } else if (data.type === 'default') {
+    for (const courseId of data.courses) {
+      await store.addCourse({ course: courseId, is_lab: data.is_lab, allowed_rooms: data.allowed_rooms })
+    }
   } else {
-    await store.addCourse(data)
+    await store.addCustomCourse({ name: data.name, is_lab: data.is_lab, allowed_rooms: data.allowed_rooms })
   }
 }
 
